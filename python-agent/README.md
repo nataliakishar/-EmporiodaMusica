@@ -1,5 +1,7 @@
 # Empório da Música — chatbot com LLM em Python
 
+**API FastAPI local disponível:** execute `run_api.py` a partir da raiz do desafio e abra `http://127.0.0.1:8000/docs`. A camada HTTP reutiliza o núcleo e o cadastro, com sessões isoladas e confirmação antes de responder. Veja [API: execução, contrato e limites](../docs/API.md). Foram aprovados 23 testes focados e um fluxo HTTP real com Supabase e uma pergunta à Groq, sem repetir as 28 conversas. Instale as dependências fixadas com `.\python-agent\.venv\Scripts\python.exe -m pip install -r python-agent\requirements-api.lock`.
+
 **Cadastro mínimo implementado:** use `/cadastro` no chat ou `run_agent.py register` para coletar nome, telefone e e-mail, conferir e confirmar a gravação no Supabase. O fluxo não envia esses campos ao LLM. Foram aprovados 18 testes focados e a integração real, sem repetir as 28 conversas anteriores. Veja [cadastro e configuração](../docs/CADASTRO.md).
 
 **Fluxo inicial atualizado:** o chat agora exige a conferência cadastral antes da primeira resposta. Ele guarda a pergunta, coleta os contatos com aviso de finalidade/LGPD, reconhece o retorno ou cadastra e retoma a pergunta. A validação focada de entrada/cadastro passou com 36 testes e integração real, sem novas chamadas à Groq. Veja [FLUXO_INICIAL.md](../docs/FLUXO_INICIAL.md).
@@ -75,7 +77,7 @@ Também há adaptadores para APIs OpenAI e compatíveis, caso sejam escolhidas d
 
 ## Ambiente e execução
 
-Python 3.10 ou superior. O transporte HTTP usa `urllib` da biblioteca padrão; a leitura do PDF requer `pypdf==6.21.4`, já instalado no ambiente virtual deste workspace. **O chat requer um LLM real acessível; consultas determinísticas e testes com dublês funcionam sem API externa.** Os comandos abaixo partem da **raiz do desafio**, onde ficam `run_agent.py` e `data/`.
+Python 3.10 ou superior. O transporte de saída para o LLM usa `urllib` da biblioteca padrão; a leitura do PDF requer `pypdf==6.21.4`, já instalado no ambiente virtual deste workspace. A API local adiciona FastAPI/Uvicorn, com instalação descrita em [API.md](../docs/API.md). **O chat requer um LLM real acessível; consultas determinísticas e testes com dublês funcionam sem API externa.** Os comandos abaixo partem da **raiz do desafio**, onde ficam `run_agent.py` e `data/`.
 
 ```powershell
 # Use o executável Python 3.10+ disponível no seu computador.
@@ -182,10 +184,10 @@ Na Groq, os scripts de avaliação usam um intervalo de 60 segundos entre pergun
 
 ## Limitações e próximas fases supervisionadas
 
-O funcionamento atual depende da Groq e de internet, sujeito a cotas e disponibilidade do serviço. Autenticação real, eventual persistência, FastAPI, Supabase e interface permanecem para fases seguintes. O índice depende dos títulos e da numeração deste manual; mudanças de estrutura exigem revisão. Não há cotação externa por CEP ou calendário de feriados. O guard de teto reconhece formas numéricas explícitas com moeda/reais; outras expressões dependem da interpretação do LLM. A proteção de preços e nomes/prefixos únicos confere evidências, mas não prova fidelidade semântica completa. Existem limites de seis rodadas, oito chamadas de ferramentas e tamanho das mensagens, além de timeout. Turnos antigos podem ser retirados do contexto enviado; guardar seis turnos não implica envio integral de todos eles. O adaptador Ollama preservado usa 4.096 tokens e pode ser lento nesta máquina de 8 GB. Somente Groq tem a nova validação remota; outros adaptadores continuam com testes HTTP controlados.
+O funcionamento atual depende da Groq e de internet, sujeito a cotas e disponibilidade do serviço. Cadastro no Supabase e API FastAPI local estão implementados; autenticação real, persistência do histórico, publicação do backend e interface permanecem para fases seguintes. As sessões da API ficam em memória em um único processo e expiram; consulte [os limites](../docs/API.md). O índice depende dos títulos e da numeração deste manual; mudanças de estrutura exigem revisão. Não há cotação externa por CEP ou calendário de feriados. O guard de teto reconhece formas numéricas explícitas com moeda/reais; outras expressões dependem da interpretação do LLM. A proteção de preços e nomes/prefixos únicos confere evidências, mas não prova fidelidade semântica completa. Existem limites de seis rodadas, oito chamadas de ferramentas e tamanho das mensagens, além de timeout. Turnos antigos podem ser retirados do contexto enviado; guardar seis turnos não implica envio integral de todos eles. O adaptador Ollama preservado usa 4.096 tokens e pode ser lento nesta máquina de 8 GB. Somente Groq tem a nova validação remota; outros adaptadores continuam com testes HTTP controlados.
 
 Não há reserva de estoque, escrita nos CSVs, compra, alteração de pedido, verificação de validade de promoção nem reconciliação de total de pedido com preço histórico: os campos necessários não foram fornecidos.
 
 ## Uso de assistente de código
 
-Foi utilizado **Codex, da OpenAI**, para inspecionar arquivos locais, ler o enunciado/manual, implementar as Fases 0, 1, a camada conversacional e a consulta ao PDF com calculadoras, escrever testes e executar as validações registradas. As decisões e limitações ficam disponíveis para revisão. Não se afirma autoria exclusivamente humana nem inferência real onde só houve teste controlado. Os resultados registrados distinguem execução determinística, dublês HTTP/LLM e validação com modelo real.
+Foi utilizado **Codex, da OpenAI**, para inspecionar arquivos locais, ler o enunciado/manual, implementar as Fases 0, 1, a camada conversacional, a consulta ao PDF com calculadoras, o cadastro e a API local, escrever testes e executar as validações registradas. As decisões e limitações ficam disponíveis para revisão. Não se afirma autoria exclusivamente humana nem inferência real onde só houve teste controlado. Os resultados registrados distinguem execução determinística, dublês HTTP/LLM e validação com modelo real.

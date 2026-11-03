@@ -4,7 +4,9 @@ O código fica isolado em [`python-agent/`](python-agent/README.md). Execute os 
 
 No GitHub, documentos internos, credenciais, CSVs de clientes/pedidos e relatórios locais não são publicados. Veja a [preparação do repositório](docs/GITHUB.md) e as [quatro conversas públicas de catálogo](docs/EXEMPLOS_CATALOGO.md). Os links para evidências locais abaixo são acessíveis no workspace do responsável.
 
-**Estado atual: núcleo de IA pela CLI, com Groq e cadastro mínimo no Supabase.** O LLM consulta catálogo e políticas; o Python coleta nome, telefone e e-mail pelo fluxo explícito de cadastro, confirma o envio e grava no PostgreSQL. Configure as chaves somente no `.env` local. A inferência permanece remota. FastAPI, autenticação de clientes e interface ficam para as próximas etapas.
+**Estado atual: núcleo de IA pela CLI e API FastAPI local, com Groq e cadastro mínimo no Supabase.** O LLM consulta catálogo e políticas; o Python coleta nome, telefone e e-mail pelo fluxo explícito de cadastro, confirma o envio e grava no PostgreSQL. Configure as chaves somente no `.env` local. A inferência permanece remota. A interface, a publicação do backend e a autenticação de clientes ficam para as próximas etapas.
+
+**API implementada e validada:** sessões isoladas, pergunta pendente até confirmar o cadastro e retomada automática do atendimento. Foram executados 23 testes focados e um fluxo HTTP real com Supabase e uma pergunta à Groq. Execute `.\python-agent\.venv\Scripts\python.exe -X utf8 run_api.py` e abra `http://127.0.0.1:8000/docs`. Consulte [rotas, exemplos e limites da API](docs/API.md). As sessões desta etapa ficam em memória, em um único processo.
 
 **Entrada atualizada:** antes da primeira resposta, o chat solicita e confirma os contatos, explica a finalidade com referência à LGPD e confere telefone + e-mail juntos no Supabase. Reconhece o retorno ou cria o cadastro, depois retoma a pergunta original. Veja o [fluxo inicial](docs/FLUXO_INICIAL.md). As demais consultas e cálculos foram preservados.
 
