@@ -7,6 +7,7 @@ from .agent import ConversationAgent
 from .config import resolve_data_dir
 from .llm import ChatModel, LLMError
 from .llm_config import LLMSettings
+from .registration import RegistrationError
 
 
 def run_chat(message: str | None = None, json_output: bool = False, show_tools: bool = False) -> int:
@@ -22,7 +23,7 @@ def run_chat(message: str | None = None, json_output: bool = False, show_tools: 
         raise LLMError("Para JSON, use chat --message com uma pergunta única.")
     print("Empório da Música — Sua música começa aqui.")
     print(f"Chat com LLM: {settings.provider} / {settings.model}.")
-    print("Converse em português. /limpar inicia outra conversa; /sair encerra. Histórico somente nesta sessão.\n")
+    print("Converse em português. /cadastro cadastra seus contatos; /limpar inicia outra conversa; /sair encerra. Histórico somente nesta sessão.\n")
     while True:
         try:
             question = input("Você: ").strip()
@@ -34,6 +35,13 @@ def run_chat(message: str | None = None, json_output: bool = False, show_tools: 
                 print("Empório: Conversa reiniciada. Como posso ajudar?")
                 continue
             if not question:
+                continue
+            if question.casefold()=='/cadastro':
+                from .registration_cli import run_registration
+                try:
+                    run_registration()
+                except RegistrationError as exc:
+                    print('Empório: '+str(exc)+'\n')
                 continue
             try:
                 answer = agent.ask(question)

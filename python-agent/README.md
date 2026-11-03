@@ -1,5 +1,7 @@
 # Empório da Música — chatbot com LLM em Python
 
+**Cadastro mínimo implementado:** use `/cadastro` no chat ou `run_agent.py register` para coletar nome, telefone e e-mail, conferir e confirmar a gravação no Supabase. O fluxo não envia esses campos ao LLM. Foram aprovados 18 testes focados e a integração real, sem repetir as 28 conversas anteriores. Veja [cadastro e configuração](../docs/CADASTRO.md).
+
 **O chat recebe perguntas em linguagem natural e as encaminha ao LLM configurado.** O modelo entende a necessidade e escolhe ferramentas; o Python valida os argumentos, consulta os CSVs originais em `data/` e devolve resultados para o modelo responder em PT-BR. Os comandos determinísticos anteriores continuam disponíveis para inspeção.
 
 **Provedor atual: GroqCloud, com `qwen/qwen3.8-27b` remoto.** A CLI precisa de internet e de uma chave local; não exige carregar um modelo na RAM local. Os modelos GPT-OSS 120B e 20B atingiram cotas durante esta fase; as tentativas e falhas foram preservadas. O Qwen está listado no plano gratuito e usa a mesma Groq, sem alteração de conta/plano. É um modelo em preview, sujeito a mudanças do provedor. Testes com dublês não comprovam inferência real.

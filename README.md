@@ -4,18 +4,22 @@ O código fica isolado em [`python-agent/`](python-agent/README.md). Execute os 
 
 No GitHub, documentos internos, credenciais, CSVs de clientes/pedidos e relatórios locais não são publicados. Veja a [preparação do repositório](docs/GITHUB.md) e as [quatro conversas públicas de catálogo](docs/EXEMPLOS_CATALOGO.md). Os links para evidências locais abaixo são acessíveis no workspace do responsável.
 
-**Estado atual: núcleo de IA pela CLI, com Groq e o modelo remoto `qwen/qwen3.8-27b`.** O terminal recebe perguntas em português, o LLM escolhe ferramentas e o Python consulta os CSVs e as seções do PDF de políticas. Configure `GROQ_API_KEY` somente em `python-agent/.env`; a inferência não exige carregar um modelo na RAM local. As políticas têm fontes com páginas e cálculos em Python. FastAPI, Supabase e a interface ficam para fases posteriores.
+**Estado atual: núcleo de IA pela CLI, com Groq e cadastro mínimo no Supabase.** O LLM consulta catálogo e políticas; o Python coleta nome, telefone e e-mail pelo fluxo explícito de cadastro, confirma o envio e grava no PostgreSQL. Configure as chaves somente no `.env` local. A inferência permanece remota. FastAPI, autenticação de clientes e interface ficam para as próximas etapas.
 
 ```powershell
 # Após configurar a chave Groq no .env local:
 .\python-agent\.venv\Scripts\python.exe run_agent.py chat
+# No chat, use /cadastro; ou abra o cadastro diretamente, sem LLM:
+.\python-agent\.venv\Scripts\python.exe run_agent.py register
+# Validação sem gravação:
+.\python-agent\.venv\Scripts\python.exe run_agent.py register --dry-run
 .\python-agent\.venv\Scripts\python.exe run_agent.py chat --message "Quanto custa o Takamine GD20?"
 # As consultas determinísticas continuam disponíveis:
 .\python-agent\.venv\Scripts\python.exe run_agent.py products --query "Takamine GD20"
 .\python-agent\.venv\Scripts\python.exe run_agent.py products --category "Violões" --max-price 1000
-.\python-agent\.venv\Scripts\python.exe python-agent\scripts\validate.py
-.\python-agent\.venv\Scripts\python.exe python-agent\scripts\validate_chat.py
-.\python-agent\.venv\Scripts\python.exe -X utf8 python-agent\scripts\validate_policies.py
+.\python-agent\.venv\Scripts\python.exe -X utf8 python-agent\scripts\validate_registration.py
 ```
 
 **135 testes locais, 28 perguntas reais e consulta ao PDF pela CLI aprovados**, com o PDF e os seis CSVs intactos. Consulte as [instruções](python-agent/README.md), o [relatório de políticas](python-agent/reports/FASE_POLITICAS.md), as [28 respostas executadas](python-agent/examples/conversas_28_executadas.md) e o [caderno atualizado](python-agent/examples/conversas_groq.md). As [evidências anteriores com Groq](python-agent/reports/FASE_GROQ.md) e os roteiros de referência foram preservados.
+
+Na etapa nova, foram executados **somente 18 testes focados**, mais a integração real do cadastro pela CLI e pelo Supabase. Não foram repetidas as 28 conversas com a Groq. Os três registros sintéticos de integração foram removidos. Veja [cadastro e decisões](docs/CADASTRO.md).

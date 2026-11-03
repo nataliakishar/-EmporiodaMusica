@@ -9,6 +9,7 @@ from .config import ConfigurationError, resolve_data_dir
 from .data import DataValidationError, load_snapshot
 from .models import QueryError, parse_price
 from .llm import LLMError
+from .registration import RegistrationError
 
 
 def parser() -> argparse.ArgumentParser:
@@ -18,6 +19,9 @@ def parser() -> argparse.ArgumentParser:
     chat = commands.add_parser("chat", help="Converse em português com um LLM que consulta os CSVs.")
     chat.add_argument("--message", help="Uma pergunta natural; omita para conversar interativamente.")
     chat.add_argument("--show-tools", action="store_true", help="Exibe os nomes das consultas executadas.")
+    register=commands.add_parser('register',help='Cadastro mínimo de cliente, sem enviar os dados ao LLM.')
+    register.add_argument('--dry-run',action='store_true',help='Valida os dados sem gravar nem acessar serviços.')
+    register.add_argument('--confirm',action='store_true',help='Confirma o envio no modo --json; os dados são lidos da entrada padrão.')
     commands.add_parser("audit", help="Auditoria administrativa sanitizada dos seis CSVs.")
     commands.add_parser("categories", help="Categorias existentes.")
     products = commands.add_parser("products", help="Busca por nome/modelo e filtros explícitos.")
@@ -79,6 +83,9 @@ def main(argv: list[str] | None = None) -> int:
         argv = ["chat"]
     args = parser().parse_args(argv)
     try:
+        if args.command=='register':
+            from .registration_cli import run_registration
+            return run_registration(args.json,args.dry_run,args.confirm)
         if args.command == "chat":
             from .chat_cli import run_chat
             return run_chat(args.message, args.json, args.show_tools)
@@ -103,8 +110,9 @@ def main(argv: list[str] | None = None) -> int:
                 result = catalog.promotions(limit=args.limit, offset=args.offset)
         print(json.dumps(result, ensure_ascii=False, indent=2) if args.json else render(result))
         return 0
-    except (ConfigurationError, DataValidationError, QueryError, LLMError) as exc:
-        error = {"code": "llm_error" if isinstance(exc, LLMError) else "invalid_configuration_or_query", "message": str(exc)}
+    except (ConfigurationError, DataValidationError, QueryError, LLMError, RegistrationError) as exc:
+        code='registration_error' if isinstance(exc,RegistrationError) else ('llm_error' if isinstance(exc,LLMError) else 'invalid_configuration_or_query')
+        error = {"code": code, "message": str(exc)}
         print(json.dumps(error, ensure_ascii=False) if args.json else f"Erro: {exc}", file=sys.stderr)
         return 2
 

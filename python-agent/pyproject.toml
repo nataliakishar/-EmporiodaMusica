@@ -1,6 +1,6 @@
 [project]
 name = "emporio-musica-agent"
-version = "0.3.0"
+version = "0.4.0"
 description = "Chat com LLM e consultas verificáveis para a Empório da Música"
 requires-python = ">=3.10"
 dependencies = ["pypdf==6.21.4"]
