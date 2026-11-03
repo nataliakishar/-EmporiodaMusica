@@ -15,3 +15,10 @@ python-agent/reports/
 python-agent/examples/
 supabase/.temp/
 supabase/.branches/
+# Artefatos locais da interface.
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/playwright-report/
+frontend/test-results/
+frontend/*.tsbuildinfo
