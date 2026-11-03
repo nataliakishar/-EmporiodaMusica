@@ -22,4 +22,6 @@ frontend/out/
 frontend/playwright-report/
 frontend/test-results/
 frontend/*.tsbuildinfo
-.vercel/
+.vercel
+.env*
+!.env.example

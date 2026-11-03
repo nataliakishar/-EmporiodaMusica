@@ -57,12 +57,14 @@ Os nove cenários cobrem apresentação e navegação, confirmação explícita/
 
 Também foi conferida a versão compilada contra a API local real, até a solicitação de cadastro e o encerramento da sessão, sem confirmação de contatos ou inferência. As capturas desktop/celular e o relatório ficam em `python-agent/.runtime/frontend/`. Para repetir **somente** essa conferência, com API aberta e porta 3000 livre, use `node scripts/check-production.mjs` após o build. O script encerra apenas o servidor Next que ele próprio inicia.
 
-## Publicação posterior
+## Publicação na Vercel
 
-Esta fase entrega a interface local e o código versionado. A raiz do projeto web na Vercel é **`frontend`**, com build `npm run build`. A preparação posterior adicionou a entrada de produção `app.py`, com sessões compartilhadas e fontes privadas no Supabase; veja [publicação completa](../docs/PUBLICACAO_VERCEL.md). O comando local `run_api.py` mantém sessões em memória. Ainda é necessário criar os deploys, configurar a URL HTTPS da API e o CORS com a origem exata do frontend; `127.0.0.1` não conecta um site público ao computador da loja.
+A interface está publicada em **https://emporio-da-musica-five.vercel.app**, conectada à API **https://emporio-da-musica-api.vercel.app**. A raiz do projeto web na Vercel é **`frontend`**, com build `npm run build`. A entrada de produção `app.py` usa sessões compartilhadas e fontes privadas no Supabase; veja [publicação completa](../docs/PUBLICACAO_VERCEL.md). O comando local `run_api.py` mantém sessões em memória.
 
-Não foram criados recursos na Vercel nem alterado o esquema do Supabase nesta fase. A inferência continua na Groq; o PC executa apenas a interface e a API enquanto o desenvolvimento for local.
+Foi validado no navegador um fluxo real de pergunta, revisão, confirmação cadastral e resposta com preço/fonte do CSV. Também foram conferidos retorno cadastral, encerramento das sessões e layout móvel. O cadastro sintético foi removido. A inferência continua na Groq; o site publicado funciona sem os processos locais. Seus limites de uso continuam se aplicando.
 
 A preparação de publicação inclui `vercel.json` com Next.js, instalação `npm ci` e build `npm run build`. Configure **Root Directory = `frontend`** nas opções do projeto Vercel. `NEXT_PUBLIC_API_URL` deve conter apenas a URL HTTPS pública da API, sem credenciais. Com a URL ausente ou apontando para localhost em um domínio público, o chat informa que a conexão está em preparação e não tenta acessar a máquina do visitante. O desenvolvimento em localhost mantém o fallback local. Para verificar somente essa proteção no build sem URL configurada, execute `node scripts/check-public-config.mjs`; esse teste não chama serviços reais.
+
+O script `node scripts/validate-vercel-live.mjs` faz um atendimento **real** no site, consome uma pergunta à Groq e cria um cadastro sintético que precisa de remoção administrativa por ID/marcadores. Use somente quando mudanças de integração justificarem repetir esse teste. Relatório e capturas ficam locais em `python-agent/reports/vercel_live_validation.json` e `.runtime/frontend/vercel-live-*.png`, ignorados no Git.
 
 Implementação, ilustrações e validação realizadas com assistência do Codex. Foram consultadas a [instalação oficial do Next.js](https://nextjs.org/docs/app/getting-started/installation), a [integração oficial do Tailwind](https://tailwindcss.com/docs/installation/framework-guides/nextjs) e a documentação distribuída com a versão instalada do Next.js.

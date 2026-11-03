@@ -1,10 +1,10 @@
 # Publicação completa na Vercel
 
-O atendimento local usa `run_api.py`, com sessões em memória. A entrada de produção é **`app.py`**, com FastAPI e sessões compartilhadas no Supabase. Os dois modos reutilizam o agente, catálogo, políticas e cadastro existentes. Preparação e testes concluídos; a criação dos projetos/deploys depende do acesso autorizado ao espaço Vercel.
+O atendimento está publicado: **[site](https://emporio-da-musica-five.vercel.app)** e **[saúde da API](https://emporio-da-musica-api.vercel.app/health)**. A entrada de produção é **`app.py`**, com FastAPI e sessões compartilhadas no Supabase. O atendimento local usa `run_api.py`, com sessões em memória. Os dois modos reutilizam o agente, catálogo, políticas e cadastro existentes.
 
 ## Dois projetos, um repositório
 
-| Projeto sugerido | Root Directory | Framework | Configuração |
+| Projeto publicado | Root Directory | Framework | Configuração |
 | --- | --- | --- | --- |
 | `emporio-da-musica-api` | Raiz do repositório | FastAPI | `vercel.json`, `requirements.txt`, `app.py` |
 | `emporio-da-musica` | `frontend` | Next.js | `frontend/vercel.json`, `package-lock.json` |
@@ -23,17 +23,17 @@ LLM_TIMEOUT_SECONDS=90
 GROQ_API_KEY=
 SUPABASE_URL=https://edrszblatsadoidzquyh.supabase.co
 SUPABASE_SECRET_KEY=
-API_ALLOWED_ORIGINS=https://DOMINIO-PUBLICADO-DO-FRONTEND
+API_ALLOWED_ORIGINS=https://emporio-da-musica-five.vercel.app
 ```
 
-As duas chaves vazias são segredos de backend e devem ser configuradas diretamente em ambiente protegido, nunca no chat, no GitHub ou como `NEXT_PUBLIC_*`. Os valores já usados localmente ficam em `python-agent/.env`. Origens adicionais de preview devem ser incluídas explicitamente, separadas por vírgula; não use `*`. Uma URL de preview protegida exige o mecanismo de acesso da própria Vercel para testes automatizados, sem desativar a proteção.
+As duas chaves foram configuradas como **Secret** para produção/preview no projeto da API, sem serem impressas. Os campos no exemplo ficam vazios deliberadamente. Os valores usados no desenvolvimento ficam em `python-agent/.env`. O envio inicial foi feito por `python-agent/scripts/configure_vercel_secrets.py`, usando stdin da CLI autenticada, sem valores em argumentos ou arquivos novos; o script não sobrescreve variáveis existentes. Origens adicionais de preview devem ser incluídas explicitamente, separadas por vírgula; não use `*`. Uma URL de preview protegida exige o mecanismo de acesso da própria Vercel para testes automatizados, sem desativar a proteção.
 
 ## Variável do frontend
 
 Somente depois de conhecer e verificar a URL da API:
 
 ```dotenv
-NEXT_PUBLIC_API_URL=https://DOMINIO-PUBLICADO-DA-API
+NEXT_PUBLIC_API_URL=https://emporio-da-musica-api.vercel.app
 ```
 
 Esse endereço é público e é incorporado durante o build. Mudar a variável exige novo build. `127.0.0.1`, `localhost` e a URL do Supabase não substituem a URL do backend do agente. Sem configuração correta em um site público, a interface mostra que o atendimento está em preparação e não tenta acessar a máquina do visitante.
@@ -55,7 +55,7 @@ O script abaixo atualiza o snapshot **privado**, usando a configuração local d
 
 Os sete arquivos originais foram conferidos após o envio e preservados localmente. A migração não altera cadastros existentes, tabelas de pedidos ou autenticação. Os campos estruturados coletados no cadastro continuam fora do contexto do LLM. Mensagens livres e trechos consultados continuam seguindo a política já aprovada de uso da Groq.
 
-## Validação executada e restante
+## Validação executada
 
 ```powershell
 # Da raiz do desafio; somente testes novos e quatro fluxos de API afetados:
@@ -68,6 +68,12 @@ Passaram 14 testes focados, a integração de duas instâncias com RPCs reais, e
 
 Também passaram o build Next.js/TypeScript e o teste focado de configuração pública: zero requisições a loopback em uma origem pública sem API configurada, mantendo a conexão de desenvolvimento local. As suítes remotas anteriores não foram repetidas.
 
-Após criar os projetos e configurar suas variáveis, ainda é necessário verificar: deploy READY no commit correto; saúde da API com `session_storage: supabase`; origem CORS; fluxo do cadastro e uma única pergunta real no site; limpeza do cadastro sintético de validação; URLs definitivas. Esses itens **não estão declarados como concluídos** antes de evidência da publicação real.
+Os dois deploys de produção chegaram a **READY** no commit `f0b7af2`, e a saúde da API retornou `200` com `session_storage: supabase`. No site público, sem sessão de login da Vercel, passaram: origem CORS, pergunta aguardando cadastro, revisão/confirmação explícita, gravação no Supabase e resposta real à pergunta sobre o Takamine GD20. O preço retornado foi conferido no CSV. Em uma segunda sessão, os mesmos contatos foram reconhecidos sem expor protocolo anterior e sem outra pergunta ao LLM. Também foram conferidos layout móvel e ausência de erros de execução no navegador.
+
+O cadastro sintético foi removido por UUID, nome/e-mail marcados e telefone sintético, e as duas sessões de teste foram encerradas. As 28 conversas anteriores não foram repetidas. Os logs de erro/fatal dos dois deploys verificados não apresentaram ocorrências na janela consultada de 15 minutos. As proteções dos previews e as regras privadas do Supabase foram preservadas.
+
+CLI 65.10.0 instalada e autenticada; plugin e MCP existentes reutilizados. Diretórios locais vinculados aos respectivos projetos, com arquivos `.vercel` e `.env.local` ignorados no Git. Os dois projetos já estão conectados ao GitHub. As evidências detalhadas ficam no relatório local `python-agent/reports/vercel_live_validation.json` e nas capturas `.runtime/frontend/vercel-live-*.png`.
+
+Os limites de requisições/tokens da Groq e os limites de hospedagem do plano continuam existindo; publicar não aumenta essas cotas. Antes de atualizar o snapshot ou mudar o núcleo, repita somente as verificações afetadas. Não há monitoramento externo/alertas configurados nesta etapa.
 
 Referências: [FastAPI na Vercel](https://vercel.com/docs/frameworks/backend/fastapi), [publicação com Git](https://vercel.com/docs/git) e [privilégios/RLS no Supabase](https://supabase.com/docs/guides/api/securing-your-api). Implementação e validação realizadas com assistência do Codex.
