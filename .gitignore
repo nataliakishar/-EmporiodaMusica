@@ -1,0 +1,17 @@
+.venv/
+**/__pycache__/
+*.py[cod]
+python-agent/.runtime/
+.env
+.env.*
+!.env.example
+# Dados privados originais são preservados localmente e não devem ser publicados.
+data/*customers.csv
+data/*orders.csv
+data/*order_items.csv
+# Documentos internos e transcrições locais permanecem fora do repositório.
+*.pdf
+python-agent/reports/
+python-agent/examples/
+supabase/.temp/
+supabase/.branches/
