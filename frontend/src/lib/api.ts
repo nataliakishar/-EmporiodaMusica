@@ -10,14 +10,32 @@ export type ApiResponse = {
   registration_confirmed?: boolean;
 };
 
-const base = (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000").replace(/\/+$/, "");
+const configuredBase = process.env.NEXT_PUBLIC_API_URL?.trim();
 
 export class ApiError extends Error {
   constructor(public code: string, message: string, public status = 0,
               public registered = false, public retryAfter?: number) { super(message); }
 }
 
+function apiBase() {
+  const localPage = typeof window !== "undefined" && ["127.0.0.1", "localhost", "[::1]"].includes(window.location.hostname);
+  if (!configuredBase && !localPage) {
+    throw new ApiError("api_not_configured", "O atendimento online está em preparação. A conexão com a IA ainda não foi publicada.");
+  }
+  let url: URL;
+  try { url = new URL(configuredBase || "http://127.0.0.1:8000"); }
+  catch { throw new ApiError("api_not_configured", "A conexão do atendimento precisa ser configurada pela loja."); }
+  const localApi = ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
+  if (url.username || url.password || url.search || url.hash ||
+      (url.protocol !== "https:" && !(localPage && localApi && url.protocol === "http:")) ||
+      (!localPage && localApi)) {
+    throw new ApiError("api_not_configured", "A conexão pública do atendimento precisa de um endereço HTTPS da loja.");
+  }
+  return url.toString().replace(/\/+$/, "");
+}
+
 async function request<T>(path: string, session?: Session, payload?: unknown, method = "POST"): Promise<T> {
+  const base = apiBase();
   let response: Response;
   try {
     response = await fetch(`${base}${path}`, {

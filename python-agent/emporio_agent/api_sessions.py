@@ -44,6 +44,7 @@ class Session:
 
 class SessionService:
     """Memória de um único processo. Não autentica clientes nem pedidos."""
+    storage = 'memory'
     def __init__(self, agent_factory=make_agent, store_factory=make_registration_store,
                  *, ttl=1800, capacity=100, clock=monotonic):
         self.agent_factory, self.store_factory = agent_factory, store_factory
@@ -56,6 +57,9 @@ class SessionService:
                    if not s.lock.locked() and self.clock() - s.touched >= self.ttl]
         for sid in expired:
             del self.sessions[sid]
+
+    def discard(self, sid):
+        del self.sessions[sid]
 
     def create(self):
         with self.lock:
@@ -119,7 +123,7 @@ class SessionService:
         with self.access(sid, token) as session:
             if not confirmed:
                 with self.lock:
-                    del self.sessions[sid]
+                    self.discard(sid)
                 return {'code': 'session_closed', 'message': 'Atendimento encerrado. Nenhum cadastro foi enviado nesta solicitação.'}
             if not session.registered:
                 try:
@@ -157,5 +161,5 @@ class SessionService:
     def close(self, sid, token):
         with self.access(sid, token):
             with self.lock:
-                del self.sessions[sid]
+                self.discard(sid)
         return {'code': 'session_closed', 'message': 'Atendimento encerrado. O cadastro na loja foi preservado.'}

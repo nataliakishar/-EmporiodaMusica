@@ -1,0 +1,4 @@
+# Backend Vercel; versões iguais às validadas na API local.
+fastapi==0.162.0
+uvicorn==0.54.0
+pypdf==6.21.4

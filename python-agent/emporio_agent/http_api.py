@@ -121,7 +121,7 @@ def create_app(service=None, *, allowed_origins=None):
 
     @app.get('/health')
     def health():
-        return {'status': 'ok', 'session_storage': 'memory', 'private_order_authentication': False}
+        return {'status': 'ok', 'session_storage': service.storage, 'private_order_authentication': False}
 
     @app.post('/sessions', status_code=201)
     def open_session():

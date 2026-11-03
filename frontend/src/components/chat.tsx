@@ -61,7 +61,7 @@ export function Chat() {
         setPhase("active");
         if (phase === "registration") setMessages(previous => [...previous, { role: "assistant", text: "Seus contatos foram conferidos. Sua pergunta está guardada; você pode tentar novamente sem repetir o cadastro." }]);
       }
-      setCanRetry(retryMessage || failure.registered);
+      setCanRetry(failure.code !== "api_not_configured" && (retryMessage || failure.registered));
     }
     return failure;
   }

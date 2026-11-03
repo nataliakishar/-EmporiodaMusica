@@ -59,8 +59,10 @@ Também foi conferida a versão compilada contra a API local real, até a solici
 
 ## Publicação posterior
 
-Esta fase entrega a interface local e o código versionado. Para conectar a Vercel depois, a raiz do projeto web será **`frontend`**, com build `npm run build`. Antes de publicar o atendimento completo, o backend Python precisa de uma URL HTTPS acessível, CORS com a origem exata do frontend e uma decisão sobre persistência/compartilhamento de sessões. O backend atual é local, em um processo e com sessões em memória; `127.0.0.1` não conecta um site público ao computador da loja.
+Esta fase entrega a interface local e o código versionado. A raiz do projeto web na Vercel é **`frontend`**, com build `npm run build`. A preparação posterior adicionou a entrada de produção `app.py`, com sessões compartilhadas e fontes privadas no Supabase; veja [publicação completa](../docs/PUBLICACAO_VERCEL.md). O comando local `run_api.py` mantém sessões em memória. Ainda é necessário criar os deploys, configurar a URL HTTPS da API e o CORS com a origem exata do frontend; `127.0.0.1` não conecta um site público ao computador da loja.
 
 Não foram criados recursos na Vercel nem alterado o esquema do Supabase nesta fase. A inferência continua na Groq; o PC executa apenas a interface e a API enquanto o desenvolvimento for local.
+
+A preparação de publicação inclui `vercel.json` com Next.js, instalação `npm ci` e build `npm run build`. Configure **Root Directory = `frontend`** nas opções do projeto Vercel. `NEXT_PUBLIC_API_URL` deve conter apenas a URL HTTPS pública da API, sem credenciais. Com a URL ausente ou apontando para localhost em um domínio público, o chat informa que a conexão está em preparação e não tenta acessar a máquina do visitante. O desenvolvimento em localhost mantém o fallback local. Para verificar somente essa proteção no build sem URL configurada, execute `node scripts/check-public-config.mjs`; esse teste não chama serviços reais.
 
 Implementação, ilustrações e validação realizadas com assistência do Codex. Foram consultadas a [instalação oficial do Next.js](https://nextjs.org/docs/app/getting-started/installation), a [integração oficial do Tailwind](https://tailwindcss.com/docs/installation/framework-guides/nextjs) e a documentação distribuída com a versão instalada do Next.js.

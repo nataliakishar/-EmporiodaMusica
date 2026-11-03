@@ -22,3 +22,4 @@ frontend/out/
 frontend/playwright-report/
 frontend/test-results/
 frontend/*.tsbuildinfo
+.vercel/

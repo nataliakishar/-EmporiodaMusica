@@ -2,6 +2,8 @@
 
 O núcleo Python fica em [`python-agent/`](python-agent/README.md) e a interface em [`frontend/`](frontend/README.md). Execute os comandos do backend **a partir desta pasta do desafio**; os dados originais permanecem em `data/`.
 
+**Publicação completa preparada:** `app.py` fornece a entrada FastAPI para nuvem, com sessões compartilhadas e fontes privadas no Supabase. A execução local com `run_api.py` permanece em memória. Foram aprovados 14 testes focados e a integração de sessões entre instâncias, sem novas perguntas à Groq. A criação dos projetos e a publicação real ainda dependem da autorização de acesso à Vercel. Veja [configuração e estado da publicação](docs/PUBLICACAO_VERCEL.md).
+
 No GitHub, documentos internos, credenciais, CSVs de clientes/pedidos e relatórios locais não são publicados. Veja a [preparação do repositório](docs/GITHUB.md) e as [quatro conversas públicas de catálogo](docs/EXEMPLOS_CATALOGO.md). Os links para evidências locais abaixo são acessíveis no workspace do responsável.
 
 **Estado atual: interface Next.js/React, núcleo de IA pela CLI e API FastAPI local, com Groq e cadastro mínimo no Supabase.** O LLM consulta catálogo e políticas; o Python coleta nome, telefone e e-mail pelo fluxo explícito de cadastro, confirma o envio e grava no PostgreSQL. Configure as chaves somente no `.env` local do backend. A inferência permanece remota. A publicação do frontend/backend e a autenticação de clientes ficam para as próximas etapas.
