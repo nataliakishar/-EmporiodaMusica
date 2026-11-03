@@ -29,8 +29,9 @@ Na raiz do desafio:
 .\python-agent\.venv\Scripts\python.exe run_agent.py chat
 ```
 
-`/cadastro` pode antecipar a coleta. O comando avulso `register` continua
-funcionando como antes. `chat --message` também exige a conferência interativa.
+`/cadastro` pode antecipar a coleta. A entrada interativa `register` agora usa
+a mesma conferência e continua no chat, com o prompt `Você:`. Assim, ela não
+encerra mais o programa logo após o recibo. `chat --message` também exige a conferência interativa.
 `--json chat --message` sem sessão cadastrada retorna `registration_required`
 e código de saída 2, sem chamar o LLM. Não existe uma flag que dispense essa
 etapa; a integração de sessões pela FastAPI será tratada na próxima fase.
@@ -74,3 +75,12 @@ Não foram desativadas proteções para eliminar esses avisos.
 Relatórios locais: `python-agent/reports/conversation_gate_validation.json` e
 `python-agent/reports/conversation_gate_live.json`. Os campos coletados não são
 incluídos nesses relatórios. Codex auxiliou na implementação e validação.
+
+## Correção da entrada register
+
+O comando interativo `register` havia mantido a gravação direta anterior e
+encerrava o programa. Essa diferença foi corrigida: ele reconhece o par de
+contatos e permanece no chat. O modo JSON passou a usar a mesma conferência,
+sem abrir uma conversa interativa. Registros anteriores não foram excluídos
+ou mesclados. A correção passou em 39 testes focados e em um caso real completo
+com Supabase e Groq; as 28 conversas não foram repetidas.

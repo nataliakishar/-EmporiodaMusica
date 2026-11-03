@@ -11,7 +11,7 @@ from .registration import RegistrationError
 from .conversation_registration import complete_conversation_registration
 
 
-def run_chat(message: str | None = None, json_output: bool = False, show_tools: bool = False) -> int:
+def run_chat(message: str | None = None, json_output: bool = False, show_tools: bool = False, *, registration_first: bool = False) -> int:
     if json_output and message is None:
         raise LLMError("Para JSON, use chat --message com uma pergunta única.")
     if json_output:
@@ -52,6 +52,18 @@ def run_chat(message: str | None = None, json_output: bool = False, show_tools: 
         return 0
     print("Empório da Música — Sua música começa aqui.")
     print("Converse em português. O cadastro será solicitado antes de continuar. /cadastro inicia essa etapa; /limpar limpa o contexto; /sair encerra.\n")
+    if registration_first:
+        try:
+            if not register():
+                return 0
+            registration_complete=True
+        except RegistrationError as exc:
+            print('Empório: '+str(exc)+'\n')
+            return 2
+        except (EOFError,KeyboardInterrupt):
+            print('\nAtendimento encerrado; nenhuma pergunta foi enviada ao modelo.')
+            return 0
+        print('Empório: Cadastro conferido. Como posso ajudar?\n')
     while True:
         try:
             question = input("Você: ").strip()

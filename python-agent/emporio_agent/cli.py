@@ -19,7 +19,7 @@ def parser() -> argparse.ArgumentParser:
     chat = commands.add_parser("chat", help="Converse em português com um LLM que consulta os CSVs.")
     chat.add_argument("--message", help="Uma pergunta natural; omita para conversar interativamente.")
     chat.add_argument("--show-tools", action="store_true", help="Exibe os nomes das consultas executadas.")
-    register=commands.add_parser('register',help='Cadastro mínimo de cliente, sem enviar os dados ao LLM.')
+    register=commands.add_parser('register',help='Confere os contatos e abre o chat; os dados de cadastro não são enviados ao LLM.')
     register.add_argument('--dry-run',action='store_true',help='Valida os dados sem gravar nem acessar serviços.')
     register.add_argument('--confirm',action='store_true',help='Confirma o envio no modo --json; os dados são lidos da entrada padrão.')
     commands.add_parser("audit", help="Auditoria administrativa sanitizada dos seis CSVs.")
@@ -84,6 +84,9 @@ def main(argv: list[str] | None = None) -> int:
     args = parser().parse_args(argv)
     try:
         if args.command=='register':
+            if not args.json and not args.dry_run:
+                from .chat_cli import run_chat
+                return run_chat(registration_first=True)
             from .registration_cli import run_registration
             return run_registration(args.json,args.dry_run,args.confirm)
         if args.command == "chat":

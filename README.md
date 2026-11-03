@@ -12,7 +12,7 @@ No GitHub, documentos internos, credenciais, CSVs de clientes/pedidos e relatór
 # Após configurar a chave Groq no .env local:
 .\python-agent\.venv\Scripts\python.exe run_agent.py chat
 # O chat solicita o cadastro antes de responder; /cadastro pode antecipá-lo.
-# O cadastro avulso também continua disponível:
+# Entrada alternativa: confere os contatos primeiro e continua no chat:
 .\python-agent\.venv\Scripts\python.exe run_agent.py register
 # Validação sem gravação:
 .\python-agent\.venv\Scripts\python.exe run_agent.py register --dry-run
@@ -28,3 +28,5 @@ No GitHub, documentos internos, credenciais, CSVs de clientes/pedidos e relatór
 Na etapa nova, foram executados **somente 18 testes focados**, mais a integração real do cadastro pela CLI e pelo Supabase. Não foram repetidas as 28 conversas com a Groq. Os três registros sintéticos de integração foram removidos. Veja [cadastro e decisões](docs/CADASTRO.md).
 
 Na mudança de entrada, passaram **36 testes focados** (18 novos e os 18 de cadastro), além da integração real. O núcleo anterior, o PDF e os CSVs continuam com os mesmos hashes; não houve chamada à Groq nesta validação.
+
+Correção da entrada `register`: agora usa a mesma conferência do chat e permanece aberto para perguntas. Passaram **39 testes focados e um único caso real completo com Supabase e Groq**. O modo JSON também reconhece contatos existentes, mas continua devolvendo somente o resultado da operação, sem abrir conversa interativa.

@@ -1,8 +1,10 @@
 # Cadastro mínimo de clientes
 
-O chat passou a exigir a conferência de cadastro antes da primeira resposta;
-veja [o fluxo inicial atualizado](FLUXO_INICIAL.md). O comando avulso `register`
-documentado abaixo permanece disponível e mantém seu comportamento.
+O chat exige a conferência de cadastro antes da primeira resposta;
+veja [o fluxo inicial atualizado](FLUXO_INICIAL.md). A entrada interativa
+`register` agora faz a mesma conferência e mantém a conversa aberta após o
+cadastro ou reconhecimento dos contatos. `--dry-run` apenas valida; o modo
+JSON devolve somente o resultado da operação.
 
 Esta etapa adiciona nome, telefone e e-mail ao Supabase/PostgreSQL, mantendo o
 agente de catálogo e políticas existente. Não importa os clientes/pedidos dos
@@ -20,6 +22,9 @@ Na raiz do desafio, com as chaves configuradas em `python-agent/.env`:
 Também é possível digitar `/cadastro` no chat. O fluxo solicita os três campos,
 mostra os dados para conferência e pede confirmação; a resposta padrão é não.
 Cancelar ou interromper antes da confirmação não solicita gravação.
+Após a confirmação, telefone e e-mail são conferidos no mesmo registro. Se o par
+já existir, o cliente recebe agradecimento pelo retorno e não é criado outro
+registro. Na entrada interativa, aguarde o prompt `Você:` para fazer perguntas.
 
 ```powershell
 # Valida sem conexão ou gravação; não requer chave Supabase nem Groq.
@@ -33,6 +38,8 @@ Em automações, `--json register --confirm` recebe somente `name`, `phone` e
 `email` como JSON pela entrada padrão. `--confirm` é obrigatório para gravar;
 não são aceitos ID, permissão, senha ou flag de autenticação no JSON. Evite
 colocar contatos pessoais em argumentos do terminal e no histórico do shell.
+O resultado pode ser `registration_existing` ou `registration_saved`. A resposta
+para contatos existentes não contém protocolo armazenado nem dados pessoais.
 
 Os campos coletados pelo fluxo de cadastro não entram no histórico do agente
 nem nas requisições à Groq. Mensagens livres do chat continuam sendo enviadas ao

@@ -150,20 +150,47 @@ class RegistrationCliTests(unittest.TestCase):
         settings.assert_not_called()
 
     def test_confirmed_submission_uses_same_service_and_hides_fields_in_receipt(self):
-        with patch('emporio_agent.registration_cli.RegistrationSettings.load'),patch('emporio_agent.registration_cli.RegistrationStore') as store:
-            store.return_value.save.side_effect=lambda draft:{'code':'registration_saved','registration_id':draft.id,'message':'Cadastro recebido.'}
+        with patch('emporio_agent.registration_cli.RegistrationSettings.load'),patch('emporio_agent.registration_cli.ConversationRegistrationStore') as store:
+            store.return_value.resolve.side_effect=lambda draft:{'code':'registration_saved','registration_id':draft.id,'message':'Cadastro recebido.'}
             code,out,err=self.run_json(['--confirm'])
         self.assertEqual(code,0)
         self.assertEqual(json.loads(out)['code'],'registration_saved')
         self.assertNotIn(DATA['email'],out)
-        store.return_value.save.assert_called_once()
+        store.return_value.resolve.assert_called_once()
 
     def test_extra_fields_are_rejected_without_writing(self):
-        with patch('emporio_agent.registration_cli.RegistrationStore') as store:
+        with patch('emporio_agent.registration_cli.ConversationRegistrationStore') as store:
             code,out,err=self.run_json(['--confirm'],DATA|{'is_authenticated':True})
         self.assertEqual(code,2)
         self.assertEqual(json.loads(err)['code'],'registration_error')
         store.assert_not_called()
+
+    def test_existing_json_customer_uses_lookup_and_does_not_insert(self):
+        with patch('emporio_agent.registration_cli.RegistrationSettings.load'),patch('emporio_agent.registration_cli.ConversationRegistrationStore') as store:
+            store.return_value.resolve.return_value={'code':'registration_existing','message':'Obrigado por retornar.'}
+            code,out,err=self.run_json(['--confirm'])
+        self.assertEqual(code,0)
+        self.assertEqual(json.loads(out)['code'],'registration_existing')
+        store.return_value.resolve.assert_called_once()
+        store.return_value.save.assert_not_called()
+
+    def test_interactive_register_checks_customer_then_keeps_chat_open(self):
+        inputs=[*DATA.values(),'s','Quanto custa um violão?','/sair']
+        with patch('builtins.input',side_effect=inputs),patch('emporio_agent.conversation_registration.RegistrationSettings.load'),patch('emporio_agent.conversation_registration.ConversationRegistrationStore') as store,patch('emporio_agent.chat_cli.LLMSettings.load',return_value=SimpleNamespace()),patch('emporio_agent.chat_cli.ChatModel'),patch('emporio_agent.chat_cli.ConversationAgent') as agent,redirect_stdout(StringIO()) as output:
+            store.return_value.resolve.return_value={'code':'registration_existing','message':'Obrigado por retornar.'}
+            agent.return_value.ask.return_value=SimpleNamespace(text='Resposta de teste.',tools=[])
+            self.assertEqual(main(['register']),0)
+        store.return_value.resolve.assert_called_once()
+        store.return_value.save.assert_not_called()
+        agent.return_value.ask.assert_called_once_with('Quanto custa um violão?')
+        self.assertIn('Obrigado por retornar',output.getvalue())
+        self.assertIn('Como posso ajudar?',output.getvalue())
+
+    def test_interactive_register_cancellation_does_not_open_model_or_write(self):
+        with patch('builtins.input',side_effect=[*DATA.values(),'n']),patch('emporio_agent.conversation_registration.ConversationRegistrationStore') as store,patch('emporio_agent.chat_cli.ConversationAgent') as agent,redirect_stdout(StringIO()):
+            self.assertEqual(main(['register']),0)
+        store.assert_not_called()
+        agent.assert_not_called()
 
     def test_cancelled_mandatory_registration_stops_chat_without_llm(self):
         settings=SimpleNamespace(provider='test',model='fake')

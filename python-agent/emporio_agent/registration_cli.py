@@ -3,7 +3,8 @@ import json
 import sys
 
 from .registration import RegistrationDraft, RegistrationError
-from .registration_store import RegistrationSettings, RegistrationStore
+from .registration_store import RegistrationSettings
+from .conversation_registration import ConversationRegistrationStore
 
 
 def run_registration(json_output=False,dry_run=False,confirmed=False):
@@ -30,7 +31,7 @@ def run_registration(json_output=False,dry_run=False,confirmed=False):
             if not confirmed:
                 result={'code':'registration_cancelled','message':'Cadastro não enviado; é necessária confirmação explícita.'}
             else:
-                result=RegistrationStore(RegistrationSettings.load()).save(draft)
+                result=ConversationRegistrationStore(RegistrationSettings.load()).resolve(draft)
         print(json.dumps(result,ensure_ascii=False) if json_output else result['message'])
         if not json_output and result.get('registration_id'):
             print('Protocolo: '+result['registration_id'])
