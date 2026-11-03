@@ -165,13 +165,13 @@ class RegistrationCliTests(unittest.TestCase):
         self.assertEqual(json.loads(err)['code'],'registration_error')
         store.assert_not_called()
 
-    def test_chat_registration_never_sends_personal_fields_to_llm_and_chat_continues(self):
+    def test_cancelled_mandatory_registration_stops_chat_without_llm(self):
         settings=SimpleNamespace(provider='test',model='fake')
         inputs=['/cadastro',DATA['name'],DATA['phone'],DATA['email'],'n','Quanto custa um violão?','/sair']
         with patch('emporio_agent.chat_cli.LLMSettings.load',return_value=settings),patch('emporio_agent.chat_cli.ChatModel'),patch('emporio_agent.chat_cli.ConversationAgent') as agent,patch('builtins.input',side_effect=inputs),redirect_stdout(StringIO()):
             agent.return_value.ask.return_value=SimpleNamespace(text='Consulta de catálogo.',tools=[])
             self.assertEqual(run_chat(),0)
-        self.assertEqual(agent.return_value.ask.call_args_list,[call('Quanto custa um violão?')])
+        agent.assert_not_called()
 
 
 if __name__=='__main__':

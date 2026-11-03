@@ -2,6 +2,8 @@
 
 **Cadastro mínimo implementado:** use `/cadastro` no chat ou `run_agent.py register` para coletar nome, telefone e e-mail, conferir e confirmar a gravação no Supabase. O fluxo não envia esses campos ao LLM. Foram aprovados 18 testes focados e a integração real, sem repetir as 28 conversas anteriores. Veja [cadastro e configuração](../docs/CADASTRO.md).
 
+**Fluxo inicial atualizado:** o chat agora exige a conferência cadastral antes da primeira resposta. Ele guarda a pergunta, coleta os contatos com aviso de finalidade/LGPD, reconhece o retorno ou cadastra e retoma a pergunta. A validação focada de entrada/cadastro passou com 36 testes e integração real, sem novas chamadas à Groq. Veja [FLUXO_INICIAL.md](../docs/FLUXO_INICIAL.md).
+
 **O chat recebe perguntas em linguagem natural e as encaminha ao LLM configurado.** O modelo entende a necessidade e escolhe ferramentas; o Python valida os argumentos, consulta os CSVs originais em `data/` e devolve resultados para o modelo responder em PT-BR. Os comandos determinísticos anteriores continuam disponíveis para inspeção.
 
 **Provedor atual: GroqCloud, com `qwen/qwen3.8-27b` remoto.** A CLI precisa de internet e de uma chave local; não exige carregar um modelo na RAM local. Os modelos GPT-OSS 120B e 20B atingiram cotas durante esta fase; as tentativas e falhas foram preservadas. O Qwen está listado no plano gratuito e usa a mesma Groq, sem alteração de conta/plano. É um modelo em preview, sujeito a mudanças do provedor. Testes com dublês não comprovam inferência real.
@@ -63,11 +65,11 @@ Nesse caso, deixe esse terminal aberto e use outro terminal na pasta do desafio 
 .\python-agent\.venv\Scripts\python.exe run_agent.py
 # Pergunta única:
 .\python-agent\.venv\Scripts\python.exe run_agent.py chat --message "Quanto custa o Takamine GD20?"
-# JSON com resposta, ferramentas e fontes:
+# Sem sessão cadastrada, este modo retorna registration_required, sem chamar o LLM:
 .\python-agent\.venv\Scripts\python.exe run_agent.py --json chat --message "Quais violões disponíveis custam até R$ 1.000?"
 ```
 
-Na conversa, `/limpar` reinicia o contexto e `/sair` encerra. Use `--show-tools` para ver os nomes das consultas executadas. O histórico mantém até seis turnos completos em memória, sem gravação das mensagens por padrão. Você pode perguntar “Quanto custa o Takamine GD20?” e depois “Esse modelo está disponível?”, sem escrever nomes de comandos internos.
+Na conversa, `/limpar` reinicia o contexto e mantém a conferência cadastral da sessão; `/sair` encerra. Use `--show-tools` para ver os nomes das consultas executadas. O histórico mantém até seis turnos completos em memória, sem gravação das mensagens por padrão. Após a entrada cadastral, você pode perguntar “Quanto custa o Takamine GD20?” e depois “Esse modelo está disponível?”, sem escrever nomes de comandos internos.
 
 Também há adaptadores para APIs OpenAI e compatíveis, caso sejam escolhidas depois. Configure `LLM_PROVIDER=openai`, um modelo com function calling em `LLM_MODEL` e `OPENAI_API_KEY` somente no `.env` local. Para outro endpoint, use `openai_compatible`, `LLM_BASE_URL` e `LLM_API_KEY`. Endpoints remotos exigem HTTPS; redirecionamentos são recusados. O protocolo segue a [documentação oficial de function calling](https://developers.openai.com/api/docs/guides/function-calling). Com APIs externas, mensagens da conversa e resultados públicos das ferramentas são enviados ao provedor; os registros dos CSVs privados de clientes e pedidos não são enviados.
 

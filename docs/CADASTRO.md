@@ -1,5 +1,9 @@
 # Cadastro mínimo de clientes
 
+O chat passou a exigir a conferência de cadastro antes da primeira resposta;
+veja [o fluxo inicial atualizado](FLUXO_INICIAL.md). O comando avulso `register`
+documentado abaixo permanece disponível e mantém seu comportamento.
+
 Esta etapa adiciona nome, telefone e e-mail ao Supabase/PostgreSQL, mantendo o
 agente de catálogo e políticas existente. Não importa os clientes/pedidos dos
 CSVs nem altera esses arquivos. Não cria login, autentica pedidos ou autoriza
@@ -80,7 +84,7 @@ pública apenas para eliminar esse aviso.
   CLI Supabase 3.0.0 e alinhado à versão registrada no banco remoto.
 
 Esses módulos de validação/persistência podem ser chamados pela futura FastAPI.
-O cadastro atual usa o comando explícito; não extrai automaticamente os dados
+O cadastro avulso usa o comando explícito; não extrai automaticamente os dados
 de mensagens livres nem oferece acesso a pedidos privados.
 
 ## Validação desta etapa
